@@ -1,6 +1,8 @@
 const nodeMailer = require("nodemailer");
+require("dotenv").config();
 
-const process = async (receiver, subject, html) => {
+
+const sendProcess = async (receiver, subject, html) => {
   try {
     const transporter = nodeMailer.createTransport({
       port: process.env.EMAIL_PORT,
@@ -26,7 +28,7 @@ const process = async (receiver, subject, html) => {
 };
 
 const sendMail = async (receiver, subject, html) => {
-  return await process(receiver, subject,html);
+  return await sendProcess(receiver, subject,html);
 };
 
 module.exports = sendMail;

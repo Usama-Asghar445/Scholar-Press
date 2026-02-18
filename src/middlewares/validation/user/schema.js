@@ -2,6 +2,22 @@ const Joi = require("joi");
 
 module.exports = {
   registerUser: Joi.object({
+    firstName: Joi.string().trim().required().messages({
+      "string.empty": "First name  cannot be empty",
+      "any.required": "First name  is required",
+    }),
+    lastName: Joi.string().trim().required().messages({
+      "string.empty": "Last name  cannot be empty",
+      "any.required": "Last name  is required",
+    }),
+     phone: Joi.string()
+    .pattern(/^[0-9]{10,15}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Phone number must be 10-15 digits",
+      "string.empty": "Phone number cannot be empty",
+      "any.required": "Phone number is required"
+    }),
     email: Joi.string().email().trim().required().messages({
       "string.empty": "Email cannot be empty",
       "any.required": "Email is required",
@@ -12,9 +28,11 @@ module.exports = {
       "any.required": "Password is required",
       "string.min": "Password must be at least 6 characters",
     }),
+    agreed:Joi.boolean()
   }),
+
   verifyUser: Joi.object({
-    email: Joi.string().email().required().trim().message({
+    email: Joi.string().email().required().trim().messages({
       "string.empty": "Email cannot be empty",
       "any.required": "Email is required",
       "string.email": "Email must be valid",
@@ -26,13 +44,14 @@ module.exports = {
     }),
   }),
 
-  forgetPassword: Joi.object({
-    email: Joi.string().email().required().trim().message({
+  emailExist: Joi.object({
+    email: Joi.string().email().required().trim().messages({
       "string.empty": "Email cannot be empty",
       "any.required": "Email is required",
       "string.email": "Email must be valid",
     }),
   }),
+
 };
 
 // updateSchema: Joi.object({

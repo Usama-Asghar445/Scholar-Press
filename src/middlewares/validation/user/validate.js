@@ -30,8 +30,8 @@ module.exports = {
     req.validatedBody = value;
     next();
   },
-  forgetPasswordValidator: (req, res, next) => {
-    const { error, value } = schema.forgetPassword.validate(req.body, {
+  emailValidator: (req, res, next) => {
+    const { error, value } = schema.emailExist.validate(req.body, {
       abortEarly: false,
     });
 

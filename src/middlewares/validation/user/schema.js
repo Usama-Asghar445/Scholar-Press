@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { ResetPassword } = require("../../../module/user/controller");
 
 module.exports = {
   registerUser: Joi.object({
@@ -10,14 +11,14 @@ module.exports = {
       "string.empty": "Last name  cannot be empty",
       "any.required": "Last name  is required",
     }),
-     phone: Joi.string()
-    .pattern(/^[0-9]{10,15}$/)
-    .required()
-    .messages({
-      "string.pattern.base": "Phone number must be 10-15 digits",
-      "string.empty": "Phone number cannot be empty",
-      "any.required": "Phone number is required"
-    }),
+    phone: Joi.string()
+      .pattern(/^[0-9]{10,15}$/)
+      .required()
+      .messages({
+        "string.pattern.base": "Phone number must be 10-15 digits",
+        "string.empty": "Phone number cannot be empty",
+        "any.required": "Phone number is required",
+      }),
     email: Joi.string().email().trim().required().messages({
       "string.empty": "Email cannot be empty",
       "any.required": "Email is required",
@@ -26,9 +27,9 @@ module.exports = {
     password: Joi.string().trim().required().min(8).messages({
       "string.empty": "Password cannot be empty",
       "any.required": "Password is required",
-      "string.min": "Password must be at least 6 characters",
+      "string.min": "Password must be at least 8 characters",
     }),
-    agreed:Joi.boolean()
+    agreed: Joi.boolean(),
   }),
 
   verifyUser: Joi.object({
@@ -52,6 +53,23 @@ module.exports = {
     }),
   }),
 
+  resetPassword: Joi.object({
+    email: Joi.string().email().required().trim().messages({
+      "string.empty": "Email cannot be empty",
+      "any.required": "Email is required",
+      "string.email": "Email must be valid",
+    }),
+    emailVerificationCode: Joi.string().trim().length(6).required().messages({
+      "string.empty": "Email verification code cannot be empty",
+      "any.required": "Email verification code is required",
+      "string.length": "Email verification code must be exactly 6 digits",
+    }),
+    newPassword: Joi.string().trim().required().min(8).messages({
+      "string.empty": "Password cannot be empty",
+      "any.required": "Password is required",
+      "string.min": "Password must be at least 8 characters",
+    }),
+  }),
 };
 
 // updateSchema: Joi.object({

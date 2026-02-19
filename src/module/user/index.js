@@ -8,7 +8,7 @@ const controller = require("./controller");
 const router = express.Router();
 
 router.post("/register", [validate.registerValidator], controller.registerUser);
-router.post("/login",controller.userLogin);
+router.post("/login", controller.userLogin);
 
 router.post(
   "/email-verify",
@@ -22,7 +22,7 @@ router.post(
 );
 router.post(
   "/reset-password",
-  [validate.verifyUserValidator],
+  [validate.resetPasswordValidator],
   controller.ResetPassword,
 );
 

@@ -8,7 +8,7 @@ const controller = require("./controller");
 const router = express.Router();
 
 router.post("/register", [validate.registerValidator], controller.registerUser);
-router.post("/login", controller.userLogin);
+router.post("/login", [validate.emailValidator], controller.userLogin);
 
 router.post(
   "/email-verify",
@@ -30,6 +30,14 @@ router.post(
   "/resend-code",
   [validate.emailValidator],
   controller.resendVerificationCode,
+);
+
+router.get("/get-user", [verifyTokenAndAttachUser], controller.getUser);
+updateUserValidator;
+router.patch(
+  "/update-user",
+  [verifyTokenAndAttachUser, validate.updateUserValidator],
+  controller.updateUserByEmail,
 );
 
 module.exports = router;

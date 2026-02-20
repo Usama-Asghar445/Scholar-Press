@@ -1,16 +1,17 @@
 const TOKEN = require("../../utils/token/index");
-
-const JWT_SECRET = process.env.JWT_SECRET;
+const User = require("../../models/user.model")
 
 module.exports = {
   verifyTokenAndAttachUser: async (req, res, next) => {
-    if (!req.header.authorization) {
+    
+    if (!req.headers.authorization) {
       return res.status(401).json("Unauthorized: No token attached");
     }
 
-    let token = req.header.authorization.split(" ")[1];
+    let token = req.headers.authorization.split(" ")[1];
     try {
-      req.user = TOKEN.verifyToken(token, JWT_SECRET);
+      req.user = TOKEN.verifyToken(token);
+      
       const retrieveUser = await User.findOne({ email: req.user.email });
       if (!retrieveUser) {
         return res.status(404).json({

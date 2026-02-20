@@ -33,7 +33,6 @@ router.post(
 );
 
 router.get("/get-user", [verifyTokenAndAttachUser], controller.getUser);
-updateUserValidator;
 router.patch(
   "/update-user",
   [verifyTokenAndAttachUser, validate.updateUserValidator],

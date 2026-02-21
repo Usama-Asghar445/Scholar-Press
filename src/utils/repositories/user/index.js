@@ -10,6 +10,13 @@ module.exports = {
 
   updateById: async (_id, data) =>
     await User.findByIdAndUpdate(_id, { $set: data }, { new: true }),
+  updateByEmail: async (email, data) =>
+    await User.findOneAndUpdate(
+      { email: email },
+      { $set: data },
+      { new: true },
+    ),
 
   deleteByUserEmail: async (email) => await User.deleteOne({ email }), //chat gtp sy pouchna hy is ko q ni kya   lower casema conver kiya hy
+  deleteUserById: async (id) => await User.findByIdAndDelete(id),
 };

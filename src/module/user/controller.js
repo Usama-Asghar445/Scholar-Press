@@ -228,6 +228,7 @@ module.exports = {
   userLogin: async (req, res) => {
     try {
       const { email, password } = req.body;
+      
       const userExist = await userRepo.findUserByEmail(email);
       if (!userExist) {
         return res.status(401).json({
@@ -243,8 +244,8 @@ module.exports = {
         });
       }
 
-      const userPassword = await comparePassword(userExist.password, password);
-      if (!userPassword)
+      const isPasswordMatch = await comparePassword(password, userExist.password);
+      if (!isPasswordMatch)
         return res.status(401).json({
           success: false,
           message: "Incorrect password. Please try again.",
@@ -256,7 +257,7 @@ module.exports = {
         role: userExist.roles,
       });
 
-      return res.status(201).json({
+      return res.status(200).json({
         success: true,
         message: "Login successful.",
         token: token,

@@ -6,7 +6,7 @@ module.exports = {
    return bcrypt.hash(password, SALT_ROUND);
   },
 
-  comparePassword: async (hashedPassword, password) => {
-   return bcrypt.compare(hashedPassword, password);
-  },
+comparePassword: async (password, hashedPassword) => {
+   return bcrypt.compare(password, hashedPassword);
+},
 };

@@ -4,6 +4,7 @@ const {
 } = require("../../middlewares/auth-state/index");
 const validate = require("../../middlewares/validation/user/validate");
 const controller = require("./controller");
+const upload = require("../../middlewares/file-handled/multer");
 
 const router = express.Router();
 
@@ -35,13 +36,21 @@ router.post(
 router.get("/get-user", [verifyTokenAndAttachUser], controller.getUser);
 router.patch(
   "/update-profile",
-  [verifyTokenAndAttachUser, validate.updateUserProfileValidator],
+  [
+    verifyTokenAndAttachUser,
+    upload.single("profileImage"),
+    validate.updateUserProfileValidator,
+  ],
   controller.updateUserProfile,
 );
 
 router.patch(
   "/complete-profile",
-  [verifyTokenAndAttachUser, validate.completeUserProfileValidator],
+  [
+    verifyTokenAndAttachUser,
+    upload.single("profileImage"),
+    validate.completeUserProfileValidator,
+  ],
   controller.completeUserProfile,
 );
 

@@ -72,32 +72,112 @@ module.exports = {
   }),
 
   updateUserProfile: Joi.object({
-    firstName: Joi.string().trim().min(2).max(50).required().messages({
-      "string.empty": "First name is required.",
+    firstName: Joi.string().trim().min(2).max(50).optional().messages({
+      "string.empty": "First name cannot be empty.",
       "string.min": "First name must be at least 2 characters long.",
       "string.max": "First name must not exceed 50 characters.",
-      "any.required": "First name is required.",
     }),
 
-    lastName: Joi.string().trim().min(2).max(50).required().messages({
-      "string.empty": "Last name is required.",
+    lastName: Joi.string().trim().min(2).max(50).optional().messages({
+      "string.empty": "Last name cannot be empty.",
       "string.min": "Last name must be at least 2 characters long.",
       "string.max": "Last name must not exceed 50 characters.",
-      "any.required": "Last name is required.",
     }),
 
-    userType: Joi.string()
-      .valid("Reader", "Author") // Only allows these two exact words
-      .optional()
-      .messages({
-        "any.only": "User type must be either Reader or Author.",
-      }),
+    // userType: Joi.string()
+    //   .valid("Reader", "Author")
+    //   .optional()
+    //   .messages({
+    //     "any.only": "User type must be either Reader or Author.",
+    //   }),
 
     phone: Joi.string()
       .pattern(/^[0-9+\-\s()]{7,20}$/)
+      .optional()
       .messages({
         "string.pattern.base": "Please enter a valid phone number.",
       }),
+
+    institution: Joi.string().trim().max(150).optional().messages({
+      "string.empty": "Institution cannot be empty.",
+      "string.max": "Institution must not exceed 150 characters.",
+    }),
+
+    department: Joi.string().trim().max(150).optional().messages({
+      "string.empty": "Department cannot be empty.",
+      "string.max": "Department must not exceed 150 characters.",
+    }),
+
+    designation: Joi.string().trim().max(100).optional().messages({
+      "string.empty": "Designation cannot be empty.",
+      "string.max": "Designation must not exceed 100 characters.",
+    }),
+
+    country: Joi.string().trim().max(100).optional().messages({
+      "string.empty": "Country cannot be empty.",
+      "string.max": "Country must not exceed 100 characters.",
+    }),
+
+    city: Joi.string().trim().max(100).optional().messages({
+      "string.empty": "City cannot be empty.",
+      "string.max": "City must not exceed 100 characters.",
+    }),
+
+    address: Joi.string().trim().max(300).allow("").optional().messages({
+      "string.max": "Address must not exceed 300 characters.",
+    }),
+
+    specializations: Joi.array()
+      .items(
+        Joi.string().trim().max(100).required().messages({
+          "string.empty": "Specialization cannot be empty.",
+          "any.required": "Specialization is required.",
+        }),
+      )
+      .min(1)
+      .optional()
+      .messages({
+        "array.base": "Specializations must be an array.",
+        "array.min": "At least one specialization is required.",
+      }),
+
+    biography: Joi.string().trim().max(1000).optional().messages({
+      "string.empty": "Biography cannot be empty.",
+      "string.max": "Biography must not exceed 1000 characters.",
+    }),
+
+    // profileImage: Joi.string().uri().optional().messages({
+    //   "string.uri": "Profile image must be a valid URL.",
+    // }),
+  }),
+
+  completeUserProfile: Joi.object({
+    firstName: Joi.string().trim().min(2).max(50).optional().messages({
+      "string.empty": "First name cannot be empty.",
+      "string.min": "First name must be at least 2 characters long.",
+      "string.max": "First name must not exceed 50 characters.",
+    }),
+
+    lastName: Joi.string().trim().min(2).max(50).optional().messages({
+      "string.empty": "Last name cannot be empty.",
+      "string.min": "Last name must be at least 2 characters long.",
+      "string.max": "Last name must not exceed 50 characters.",
+    }),
+
+    phone: Joi.string()
+      .pattern(/^[0-9+\-\s()]{7,20}$/)
+      .optional()
+      .messages({
+        "string.pattern.base": "Please enter a valid phone number.",
+      }),
+
+    // userType: Joi.string()
+    //   .valid("Reader", "Author")
+    //   .required()
+    //   .messages({
+    //     "any.only": "User type must be either Reader or Author.",
+    //     "any.required": "User type is required.",
+    //   }),
 
     institution: Joi.string().trim().max(150).required().messages({
       "string.empty": "Institution name is required.",
@@ -124,21 +204,23 @@ module.exports = {
       "any.required": "City is required.",
     }),
 
-    address: Joi.string().trim().max(300).allow("").messages({
-      "string.max": "Address must not exceed 300 characters.",
+    address: Joi.string().trim().max(300).required().messages({
+      "string.empty": "Address is required.",
+      "any.required": "Address is required.",
     }),
 
     specializations: Joi.array()
       .items(
-        Joi.string().trim().max(100).messages({
-          "string.empty": "A specialization item cannot be empty.",
+        Joi.string().trim().max(100).required().messages({
+          "string.empty": "Specialization cannot be empty.",
         }),
       )
       .min(1)
-      .optional()
+      .required()
       .messages({
-        "array.base": "Specializations must be an array of selected items.",
+        "array.base": "Specializations must be an array.",
         "array.min": "Please select at least one specialization.",
+        "any.required": "Specializations are required.",
       }),
 
     biography: Joi.string().trim().max(1000).required().messages({
@@ -146,86 +228,6 @@ module.exports = {
       "any.required": "Biography is required.",
     }),
 
-    profileImage: Joi.string().uri().allow("").messages({
-      "string.uri": "Profile image must be a valid URL.",
-    }),
-  }),
-
-  completeUserProfile: Joi.object({
-    firstName: Joi.string().trim().min(2).max(50).required().messages({
-      "string.empty": "First name is required.",
-      "any.required": "First name is required.",
-    }),
-
-    lastName: Joi.string().trim().min(2).max(50).required().messages({
-      "string.empty": "Last name is required.",
-      "any.required": "Last name is required.",
-    }),
-
-    userType: Joi.string()
-      .valid("Reader", "Author") // Only allows these two exact words
-      .required()
-      .messages({
-        "any.only": "User type must be either Reader or Author.",
-        "any.required": "User type is required.",
-      }),
-
-    phone: Joi.string()
-      .pattern(/^[0-9+\-\s()]{7,20}$/)
-      .required() // REMOVED .allow("")
-      .messages({
-        "string.empty": "Phone number is required.",
-        "string.pattern.base": "Please enter a valid phone number.",
-      }),
-
-    institution: Joi.string().trim().max(150).required().messages({
-      "string.empty": "Institution name is required.",
-    }),
-
-    department: Joi.string().trim().max(150).required().messages({
-      "string.empty": "Department is required.",
-    }),
-
-    designation: Joi.string().trim().max(100).required().messages({
-      "string.empty": "Designation is required.",
-    }),
-
-    country: Joi.string().trim().max(100).required().messages({
-      "string.empty": "Country is required.",
-    }),
-
-    city: Joi.string().trim().max(100).required().messages({
-      "string.empty": "City is required.",
-    }),
-
-    address: Joi.string().trim().max(300).required().messages({
-      // REMOVED .allow("")
-      "string.empty": "Address is required.",
-    }),
-
-    specializations: Joi.array()
-      .items(
-        Joi.string().trim().max(100).messages({
-          "string.empty": "A specialization item cannot be empty.",
-        }),
-      )
-      .min(1) // Ensures they select at least one checkbox
-      .required()
-      .messages({
-        "array.base": "Specializations must be an array of selected items.",
-        "array.min": "Please select at least one specialization.",
-        "any.required": "Specializations are required.",
-      }),
-
-    biography: Joi.string().trim().max(1000).required().messages({
-      "string.empty": "Biography is required.",
-    }),
-
-    profileImage: Joi.string().uri().required().messages({
-      // REMOVED .allow("")
-      "string.empty": "Profile image is required.",
-      "string.uri": "Profile image must be a valid URL.",
-    }),
   }),
 
   login: Joi.object({

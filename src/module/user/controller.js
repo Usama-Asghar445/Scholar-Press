@@ -7,6 +7,7 @@ const services = require("./service");
 const TOKEN = require("../../utils/token");
 const user = require("../../utils/repositories/user/index");
 const { sendMail } = require("../../utils/send-email/index");
+const uploadImage = require("../../utils/cloudinary-file-storage/index");
 
 module.exports = {
   registerUser: async (req, res) => {
@@ -57,7 +58,7 @@ module.exports = {
       return res.status(error.statusCode || 500).json({
         success: false,
         message: "Internal Server Error",
-        error:error.message
+        error: error.message,
       });
     }
   },
@@ -228,7 +229,7 @@ module.exports = {
   userLogin: async (req, res) => {
     try {
       const { email, password } = req.body;
-      
+
       const userExist = await userRepo.findUserByEmail(email);
       if (!userExist) {
         return res.status(401).json({
@@ -244,7 +245,10 @@ module.exports = {
         });
       }
 
-      const isPasswordMatch = await comparePassword(password, userExist.password);
+      const isPasswordMatch = await comparePassword(
+        password,
+        userExist.password,
+      );
       if (!isPasswordMatch)
         return res.status(401).json({
           success: false,
@@ -303,7 +307,6 @@ module.exports = {
       const data = req.validatedBody;
 
       const userExist = await userRepo.findUserByEmail(email);
-
       if (!userExist) {
         return res.status(404).json({
           success: false,
@@ -317,6 +320,14 @@ module.exports = {
           message: "Profile already completed. You can only update it now.",
         });
       }
+
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "Profile image is required.",
+        });
+      }
+      data.profileImage = await uploadImage(req?.file);
 
       data.isProfileComplete = true;
       data.profileCompletedAt = new Date();
@@ -341,6 +352,10 @@ module.exports = {
     try {
       const email = req.userEmail;
       const data = req.validatedBody;
+
+      if (req.file) {
+        data.profileImage = await uploadImage(req?.file);
+      }
 
       const userExist = await userRepo.findUserByEmail(email);
 

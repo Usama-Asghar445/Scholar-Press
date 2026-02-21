@@ -235,6 +235,13 @@ module.exports = {
         });
       }
 
+      if (!userExist.isEmailVerified) {
+        return res.status(401).json({
+          success: false,
+          message: "Please verified your email first.",
+        });
+      }
+
       const userPassword = await comparePassword(userExist.password, password);
       if (!userPassword)
         return res.status(401).json({

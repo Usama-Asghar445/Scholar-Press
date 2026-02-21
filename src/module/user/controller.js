@@ -10,6 +10,7 @@ const { sendMail } = require("../../utils/send-email/index");
 
 module.exports = {
   registerUser: async (req, res) => {
+    let createdUser = null;
     try {
       const userDetail = req.validatedBody;
       const userExist = await userRepo.findUserByEmail(userDetail.email);
@@ -22,33 +23,40 @@ module.exports = {
       }
 
       userDetail.password = await hashPassword(userDetail.password);
-
       userDetail.emailVerificationCode = services.generateRandomNumber();
-
       userDetail.emailCodeExpires = services.codeExpireTime();
+      userDetail.isVerified = false;
 
-      const user = await userRepo.createUser(userDetail);
-      await sendMail(
-        user.email,
-        "verification-code",
-        {
-          userName: user.firstName,
-          code: user.emailVerificationCode,
-        },
-        "Your Verification Code",
-      );
+      createdUser = await userRepo.createUser(userDetail);
+
+      try {
+        await sendMail(
+          userDetail.email,
+          "verification-code",
+          {
+            userName: userDetail.firstName,
+            code: userDetail.emailVerificationCode,
+          },
+          "Your Verification Code",
+        );
+      } catch (mailError) {
+        await userRepo.deleteUserById(createdUser._id);
+        console.error("Mail failed, user deleted:", mailError);
+        return res.status(503).json({
+          success: false,
+          message: "Email service unavailable. Please try again later.",
+        });
+      }
 
       return res.status(201).json({
         success: true,
-        message:
-          "Registration successful. Please check your email for the verification code.",
+        message: "Registration successful. Please check your email.",
       });
     } catch (error) {
       console.error("Register Error:", error);
       return res.status(error.statusCode || 500).json({
         success: false,
         message: "Internal Server Error",
-        error: error.message,
       });
     }
   },
@@ -280,84 +288,80 @@ module.exports = {
     }
   },
 
-completeUserProfile: async (req, res) => {
-  try {
-    const email = req.userEmail;
-    const data = req.validatedBody;
+  completeUserProfile: async (req, res) => {
+    try {
+      const email = req.userEmail;
+      const data = req.validatedBody;
 
-    const userExist = await userRepo.findUserByEmail(email);
+      const userExist = await userRepo.findUserByEmail(email);
 
-    if (!userExist) {
-      return res.status(404).json({
+      if (!userExist) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      if (userExist.isProfileComplete) {
+        return res.status(400).json({
+          success: false,
+          message: "Profile already completed. You can only update it now.",
+        });
+      }
+
+      data.isProfileComplete = true;
+      data.profileCompletedAt = new Date();
+
+      const updatedUser = await userRepo.updateByEmail(email, data);
+
+      return res.status(200).json({
+        success: true,
+        message: "Profile completed successfully.",
+        data: updatedUser,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
         success: false,
-        message: "User not found",
+        message: "Server error",
       });
     }
+  },
 
-    if (userExist.isProfileComplete) {
-      return res.status(400).json({
+  updateUserProfile: async (req, res) => {
+    try {
+      const email = req.userEmail;
+      const data = req.validatedBody;
+
+      const userExist = await userRepo.findUserByEmail(email);
+
+      if (!userExist) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      if (!userExist.isProfileComplete) {
+        return res.status(400).json({
+          success: false,
+          message: "Please complete your profile first.",
+        });
+      }
+
+      const updatedUser = await userRepo.updateByEmail(email, data);
+
+      return res.status(200).json({
+        success: true,
+        message: "Profile updated successfully.",
+        data: updatedUser,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
         success: false,
-        message: "Profile already completed. You can only update it now.",
+        message: "Server error",
       });
     }
-
-    data.isProfileComplete = true;
-    data.profileCompletedAt = new Date();
-
-    const updatedUser = await userRepo.updateByEmail(email, data);
-
-    return res.status(200).json({
-      success: true,
-      message: "Profile completed successfully.",
-      data: updatedUser,
-    });
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
-},
-
-
-updateUserProfile: async (req, res) => {
-  try {
-    const email = req.userEmail;
-    const data = req.validatedBody;
-
-    const userExist = await userRepo.findUserByEmail(email);
-
-    if (!userExist) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    if (!userExist.isProfileComplete) {
-      return res.status(400).json({
-        success: false,
-        message: "Please complete your profile first.",
-      });
-    }
-
-    const updatedUser = await userRepo.updateByEmail(email, data);
-
-    return res.status(200).json({
-      success: true,
-      message: "Profile updated successfully.",
-      data: updatedUser,
-    });
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
-},
-
+  },
 };

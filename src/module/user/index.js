@@ -8,7 +8,7 @@ const controller = require("./controller");
 const router = express.Router();
 
 router.post("/register", [validate.registerValidator], controller.registerUser);
-router.post("/login", [validate.emailValidator], controller.userLogin);
+router.post("/login", [validate.loginValidator], controller.userLogin);
 
 router.post(
   "/email-verify",
@@ -34,9 +34,15 @@ router.post(
 
 router.get("/get-user", [verifyTokenAndAttachUser], controller.getUser);
 router.patch(
-  "/update-user",
-  [verifyTokenAndAttachUser, validate.updateUserValidator],
-  controller.updateUserByEmail,
+  "/update-profile",
+  [verifyTokenAndAttachUser, validate.updateUserProfileValidator],
+  controller.updateUserProfile,
+);
+
+router.patch(
+  "/complete-profile",
+  [verifyTokenAndAttachUser, validate.completeUserProfileValidator],
+  controller.completeUserProfile,
 );
 
 module.exports = router;

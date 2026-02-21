@@ -40,7 +40,8 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     specializations: {
-      type: String,
+      type: [String], // Change from String to [String]
+      default: [],
     },
     biography: {
       type: String,
@@ -70,15 +71,13 @@ const userSchema = new mongoose.Schema(
     },
     roles: {
       type: [String],
-      enum: [
-        "Author",
-        "Reviewer",
-        "Editor",
-        "Associate Editor",
-        "Editor in Chief",
-        "Editorial Board Member",
-      ],
-      default: ["Author"],
+      enum: ["Reviewer", "Editor", "Associate Editor", "Editor in Chief"],
+      default: [],
+    },
+    userType: {
+      type: String,
+      enum: ["Reader", "Author"],
+      default: "Reader",
     },
   },
   { timestamps: true },

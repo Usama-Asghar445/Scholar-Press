@@ -60,8 +60,38 @@ module.exports = {
     next();
   },
 
-  updateUserValidator: (req, res, next) => {
-    const { error, value } = schema.updateUser.validate(req.body, {
+  updateUserProfileValidator: (req, res, next) => {
+    const { error, value } = schema.updateUserProfile.validate(req.body, {
+      abortEarly: false,
+    });
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message,
+      });
+    }
+    req.validatedBody = value;
+    next();
+  },
+
+  completeUserProfileValidator: (req, res, next) => {
+    const { error, value } = schema.completeUserProfile.validate(req.body, {
+      abortEarly: false,
+    });
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message,
+      });
+    }
+    req.validatedBody = value;
+    next();
+  },
+
+  loginValidator: (req, res, next) => {
+    const { error, value } = schema.login.validate(req.body, {
       abortEarly: false,
     });
 

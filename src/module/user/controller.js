@@ -327,7 +327,7 @@ module.exports = {
           message: "Profile image is required.",
         });
       }
-      data.profileImage = await pushFileToCloudinary(req?.file);
+      data.profileImage = (await pushFileToCloudinary(req?.file)).url;
 
       data.isProfileComplete = true;
       data.profileCompletedAt = new Date();

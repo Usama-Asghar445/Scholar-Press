@@ -39,8 +39,12 @@ const userSchema = new mongoose.Schema(
     address: {
       type: String,
     },
+    fieldOfStudy: {
+      type: String,
+      enum: ["Biology", "Computer Science", "Physics"],
+    },
     specializations: {
-      type: [String], // Change from String to [String]
+      type: [String],
       default: [],
     },
     biography: {
@@ -70,9 +74,9 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
     roles: {
-      type: [String],
+      type: String,
       enum: ["Reviewer", "Editor", "Associate Editor", "Editor in Chief"],
-      default: [],
+      default: null,
     },
     userType: {
       type: String,
@@ -84,3 +88,10 @@ const userSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("users", userSchema);
+
+// const qualificationSchema = new mongoose.Schema({
+//   degree: { type: String, required: true }, // e.g., PhD, MSc, MD
+//   field: { type: String, required: true },  // e.g., Computer Science
+//   institution: { type: String },
+//   year: { type: Number }
+// });

@@ -34,6 +34,6 @@ module.exports = {
       uploadedFiles.supplementaryDetails = [];
     }
 
-    return paperFileUploader; 
+    return uploadedFiles; 
   },
 };

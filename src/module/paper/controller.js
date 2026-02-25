@@ -3,14 +3,12 @@ const userRepo = require("../../utils/repositories/user/index");
 const { PAPER } = require("../../common/constant/index");
 // const service = require("./service")
 const Paper = require("../../models/paper.model")
-const paperFileUploader = require("../../common/cloudinary/index")
+const {paperFileUploader} = require("../../common/cloudinary/index")
 
 module.exports = {
   createPaper: async (req, res) => {
     try {
-      const authorID = req.userId;
-      console.log("authorID:",authorID);
-      
+      const authorID = req.userId;      
       const paperDetail =  req.validatedBody;
       const isAuthorExist = await userRepo.findUserById(authorID);
       if (!isAuthorExist) {

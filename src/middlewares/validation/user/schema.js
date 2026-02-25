@@ -209,6 +209,16 @@ module.exports = {
       "any.required": "Address is required.",
     }),
 
+    fieldOfStudy: Joi.string()
+      .trim()
+      .valid("Biology", "Computer Science", "Physics")
+      .required()
+      .messages({
+        "string.empty": "Field of Study is required.",
+        "any.required": "Field of Study is required.",
+        "any.only": "Please select a valid field of study.",
+      }),
+
     specializations: Joi.array()
       .items(
         Joi.string().trim().max(100).required().messages({
@@ -227,7 +237,6 @@ module.exports = {
       "string.empty": "Biography is required.",
       "any.required": "Biography is required.",
     }),
-
   }),
 
   login: Joi.object({

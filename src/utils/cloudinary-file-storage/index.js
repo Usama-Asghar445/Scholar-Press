@@ -1,6 +1,6 @@
 const cloudinary = require("./cloudinary.config");
 
-const uploadImage = async (file) => {
+const pushFileToCloudinary = async (file) => {
   const fileName = Date.now() + "-" + file.originalname.replace(/\s+/g, "-");
 
   const options = {
@@ -9,17 +9,23 @@ const uploadImage = async (file) => {
     unique_filename: true,
     overwrite: false,
     public_id: fileName,
-    resource_type: "auto", 
+    resource_type: "auto",
   };
 
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(options, (error, result) => {
-      if (error) return reject(error);
-      resolve(result.secure_url);
-    });
+    const stream = cloudinary.uploader.upload_stream(
+      options,
+      (error, result) => {
+        if (error) return reject(error);
+        resolve({
+          name: file.originalname,
+          url: result.secure_url,
+        });
+      },
+    );
 
-    stream.end(file.buffer); 
+    stream.end(file.buffer);
   });
 };
 
-module.exports = uploadImage;
+module.exports = pushFileToCloudinary;

@@ -7,7 +7,7 @@ const services = require("./service");
 const TOKEN = require("../../utils/token");
 const user = require("../../utils/repositories/user/index");
 const { sendMail } = require("../../utils/send-email/index");
-const uploadImage = require("../../utils/cloudinary-file-storage/index");
+const pushFileToCloudinary = require("../../utils/cloudinary-file-storage/index");
 
 module.exports = {
   registerUser: async (req, res) => {
@@ -327,7 +327,7 @@ module.exports = {
           message: "Profile image is required.",
         });
       }
-      data.profileImage = await uploadImage(req?.file);
+      data.profileImage = await pushFileToCloudinary(req?.file);
 
       data.isProfileComplete = true;
       data.profileCompletedAt = new Date();
@@ -354,7 +354,7 @@ module.exports = {
       const data = req.validatedBody;
 
       if (req.file) {
-        data.profileImage = await uploadImage(req?.file);
+        data.profileImage = await pushFileToCloudinary(req?.file);
       }
 
       const userExist = await userRepo.findUserByEmail(email);

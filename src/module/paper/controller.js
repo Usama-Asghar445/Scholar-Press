@@ -2,14 +2,14 @@ const paperRepo = require("../../utils/repositories/paper/index");
 const userRepo = require("../../utils/repositories/user/index");
 const { PAPER } = require("../../common/constant/index");
 // const service = require("./service")
-const Paper = require("../../models/paper.model")
-const {paperFileUploader} = require("../../common/cloudinary/index")
+const Paper = require("../../models/paper.model");
+const { paperFileUploader } = require("../../common/cloudinary/index");
 
 module.exports = {
   createPaper: async (req, res) => {
     try {
-      const authorID = req.userId;      
-      const paperDetail =  req.validatedBody;
+      const authorID = req.userId;
+      const paperDetail = req.validatedBody;
       const isAuthorExist = await userRepo.findUserById(authorID);
       if (!isAuthorExist) {
         return res.status(400).json({
@@ -18,9 +18,7 @@ module.exports = {
         });
       }
 
-    const uploadedFiles = await paperFileUploader(req.files);
-
-    
+      const uploadedFiles = await paperFileUploader(req.files);
 
       paperDetail.userId = isAuthorExist._id;
       paperDetail.status = PAPER.SUBMIT;
@@ -43,23 +41,32 @@ module.exports = {
     }
   },
 
+  getPapers: async (req, res) => {
+    try {
+      const papers = await paperRepo.findPapers();
 
-  getPapers : async(req,res)=>{
-    try{
-      const papers = await Paper.find().sort({ createdAt: -1 });
-     return res.status(200).json({
+      if (!papers || papers.length === 0) {
+        return res.status(200).json({
+          success: true,
+          message: "No papers found",
+          data: [],
+        });
+      }
+
+      return res.status(200).json({
         success: true,
-        message: "Paper is get successfully",
+        message: "Papers fetched successfully",
+        count: papers.length,
         data: papers,
       });
+    } catch (error) {
+      console.error("Get Papers  Error:", error);
 
-    }catch (error) {
-      console.log("error :", error);
       return res.status(500).json({
         success: false,
-        message: "Error processing request",
+        message: "Failed to fetch papers",
         error: error.message,
       });
     }
-  }
+  },
 };

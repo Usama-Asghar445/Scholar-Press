@@ -73,15 +73,27 @@ const userSchema = new mongoose.Schema(
     emailCodeExpires: {
       type: Date,
     },
-    roles: {
-      type: String,
-      enum: ["Reviewer", "Editor", "Associate Editor", "Editor in Chief"],
-      default: null,
-    },
     userType: {
       type: String,
-      enum: ["Reader", "Author"],
-      default: "Reader",
+      enum: [
+        "Reader",
+        "Author",
+        "Reviewer",
+        "Editor",
+        "Associate Editor",
+        "Editor in Chief",
+      ],
+      default: "Author",
+    },
+    appliedRole: {
+      type: String,
+      enum: ["Reviewer", "Editor", "Associate Editor", null],
+      default: null,
+    },
+    applicationStatus: {
+      type: String,
+      enum: ["None", "Pending", "Approved", "Rejected"],
+      default: "None",
     },
   },
   { timestamps: true },

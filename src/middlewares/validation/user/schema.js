@@ -251,4 +251,15 @@ module.exports = {
       "string.min": "Password must be at least 8 characters",
     }),
   }),
+
+  appliedForRole: Joi.object({
+    roleRequested: Joi.string()
+      .valid("Reviewer", "Editor", "Associate Editor")
+      .required()
+      .messages({
+        "any.only":
+          "You can only apply to be a Reviewer, Editor, or Associate Editor.",
+        "any.required": "Please specify the role you are applying for.",
+      }),
+  }),
 };

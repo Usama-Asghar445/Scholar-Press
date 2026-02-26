@@ -89,7 +89,7 @@ module.exports = {
 
       const token = TOKEN.generateToken({
         userId: userExist._id,
-        role: userExist.roles,
+        role: userExist.userType,
       });
 
       await userExist.save();
@@ -209,7 +209,7 @@ module.exports = {
       const token = TOKEN.generateToken({
         email: userExist.email,
         userId: userExist._id,
-        role: userExist.roles,
+        role: userExist.userType,
       });
 
       return res.status(201).json({
@@ -258,13 +258,14 @@ module.exports = {
       const token = TOKEN.generateToken({
         userId: userExist._id,
         email: userExist.email,
-        role: userExist.roles,
+        role: userExist.userType,
       });
 
       return res.status(200).json({
         success: true,
         message: "Login successful.",
         token: token,
+        role: userExist.userType,
       });
     } catch (error) {
       console.error("Login error:", error);
@@ -379,6 +380,25 @@ module.exports = {
         success: true,
         message: "Profile updated successfully.",
         data: updatedUser,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+      });
+    }
+  },
+
+  appliedForRole: async (req, res) => {
+    try {
+      const { roleRequested } = req.validatedBody;
+      const userId = req.userId;
+      const updateUser = await userRepo.appliedForRole(userId, roleRequested);
+      return res.status(200).json({
+        success: true,
+        message: `Application for ${roleRequested} submitted. Wait for Chief approval.`,
+        data: updateUser,
       });
     } catch (error) {
       console.error(error);

@@ -1,11 +1,12 @@
 const express = require("express");
 const controller = require("./controller");
-// const {
-//   verifyChiefEditorKey,
-// } = require("../../../middlewares/chief-editor/auth-state");
+const {
+  verifyTokenAndAttachUser,
+} = require("../../../middlewares/auth-state/index");
+const validation = require("../../../middlewares/validation/chief-editor/role-management/validation")
 
 const router = express.Router();
 
-router.post ("/get-applications",controller.getPendingApplications)
-router.post ("/accept-status",controller.acceptStatus)
+router.get ("/get-pending-applications",[verifyTokenAndAttachUser],controller.getPendingApplications)
+router.patch ("/accept-role-status",[verifyTokenAndAttachUser,validation.acceptRoleValidator],controller.acceptStatus)
 module.exports = router;

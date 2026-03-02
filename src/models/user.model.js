@@ -73,7 +73,7 @@ const userSchema = new mongoose.Schema(
     emailCodeExpires: {
       type: Date,
     },
-    userType: {
+    role: {
       type: String,
       enum: [
         "Reader",
@@ -85,25 +85,8 @@ const userSchema = new mongoose.Schema(
       ],
       default: "Author",
     },
-    appliedRole: {
-      type: String,
-      enum: ["Reviewer", "Editor", "Associate Editor", null],
-      default: null,
-    },
-    applicationStatus: {
-      type: String,
-      enum: ["None", "Pending", "Approved", "Rejected"],
-      default: "None",
-    },
   },
   { timestamps: true },
 );
 
 module.exports = mongoose.model("users", userSchema);
-
-// const qualificationSchema = new mongoose.Schema({
-//   degree: { type: String, required: true }, // e.g., PhD, MSc, MD
-//   field: { type: String, required: true },  // e.g., Computer Science
-//   institution: { type: String },
-//   year: { type: Number }
-// });

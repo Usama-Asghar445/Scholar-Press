@@ -44,4 +44,11 @@ module.exports = {
       createdAt: -1,
     });
   },
+
+  findPendingApplicationStatusUserById: async (_id) => {
+  return await User.findOne({ 
+    _id: _id, 
+    applicationStatus: "Pending" 
+  });
+}
 };

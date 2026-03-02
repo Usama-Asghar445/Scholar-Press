@@ -1,10 +1,10 @@
 const express = require("express");
 const controller = require("./controller");
-// const {
-//   verifyChiefEditorKey,
-// } = require("../../../middlewares/chief-editor/auth-state");
+const {
+  verifyTokenAndAttachUser,
+} = require("../../../middlewares/auth-state/index");
 
 const router = express.Router();
 
-router.post ("/get-papers",controller.getPapersByEID)
+router.post ("/get-papers",[verifyTokenAndAttachUser],controller.getPapersByEID)
 module.exports = router;

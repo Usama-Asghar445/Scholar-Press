@@ -253,7 +253,7 @@ module.exports = {
   }),
 
   appliedForRole: Joi.object({
-    roleRequested: Joi.string()
+    appliedRole: Joi.string()
       .valid("Reviewer", "Editor", "Associate Editor")
       .required()
       .messages({

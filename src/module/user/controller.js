@@ -212,13 +212,14 @@ module.exports = {
       const token = TOKEN.generateToken({
         email: userExist.email,
         userId: userExist._id,
-        role: userExist.userType,
+        role: userExist.role,
       });
 
       return res.status(201).json({
         success: true,
         message: "Password reset successfully",
         token: token,
+        role: userExist.role,
       });
     } catch (error) {
       return res.status(error.statusCode || 500).json({
@@ -261,7 +262,7 @@ module.exports = {
       const token = TOKEN.generateToken({
         userId: userExist._id,
         email: userExist.email,
-        role: userExist.userType,
+        role: userExist.role,
       });
 
       return res.status(200).json({

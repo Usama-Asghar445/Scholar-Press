@@ -61,6 +61,12 @@ module.exports = {
   },
 
   updateUserProfileValidator: (req, res, next) => {
+    if (
+      req.body.specializations &&
+      typeof req.body.specializations === "string"
+    ) {
+      req.body.specializations = [req.body.specializations];
+    }
     const { error, value } = schema.updateUserProfile.validate(req.body, {
       abortEarly: false,
     });

@@ -33,7 +33,7 @@ router.post(
   controller.resendVerificationCode,
 );
 
-router.get("/get-user", [verifyTokenAndAttachUser], controller.getUserById);
+router.get("/get", [verifyTokenAndAttachUser], controller.getUserById);
 router.patch(
   "/update-profile",
   [

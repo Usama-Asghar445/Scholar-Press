@@ -8,6 +8,9 @@ const TOKEN = require("../../utils/token");
 const user = require("../../utils/repositories/user/index");
 const { sendMail } = require("../../utils/send-email/index");
 const pushFileToCloudinary = require("../../utils/cloudinary-file-storage/index");
+const RoleApplication = require("../../models/role-application.model");
+const RoleHistory = require("../../models/role-history.model");
+const User = require("../../models/user.model");
 
 module.exports = {
   registerUser: async (req, res) => {
@@ -89,7 +92,7 @@ module.exports = {
 
       const token = TOKEN.generateToken({
         userId: userExist._id,
-        role: userExist.roles,
+        role: userExist.userType,
       });
 
       await userExist.save();
@@ -209,7 +212,7 @@ module.exports = {
       const token = TOKEN.generateToken({
         email: userExist.email,
         userId: userExist._id,
-        role: userExist.roles,
+        role: userExist.userType,
       });
 
       return res.status(201).json({
@@ -258,13 +261,14 @@ module.exports = {
       const token = TOKEN.generateToken({
         userId: userExist._id,
         email: userExist.email,
-        role: userExist.roles,
+        role: userExist.userType,
       });
 
       return res.status(200).json({
         success: true,
         message: "Login successful.",
         token: token,
+        role: userExist.role,
       });
     } catch (error) {
       console.error("Login error:", error);
@@ -275,28 +279,32 @@ module.exports = {
     }
   },
 
-  getUser: async (req, res) => {
+  getUserById: async (req, res) => {
     try {
-      const email = req.userEmail;
-      console.log(email);
+      const userId = req.userId;
 
-      const userExist = await userRepo.findUserByEmail(email);
-      if (!userExist) {
-        return res.status(401).json({
+      const user = await User.findById(userId).select("-password");
+
+      if (!user) {
+        return res.status(404).json({
           success: false,
-          message: "No account found with this email address.",
+          message:
+            "We could not find your account. Please contact support if this issue persists.",
         });
       }
-      return res.status(201).json({
+
+      return res.status(200).json({
         success: true,
-        message: "User get successfully",
-        data: userExist,
+        message: `Welcome back, ${user.name}! Your ${user.role} dashboard data has been loaded successfully.`,
+        data: user,
       });
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Error fetching user:", error);
       return res.status(500).json({
         success: false,
-        message: "An unexpected error occurred. Please try again later.",
+        message:
+          "Something went wrong while retrieving your account information.",
+        error: error.message,
       });
     }
   },
@@ -385,6 +393,138 @@ module.exports = {
       return res.status(500).json({
         success: false,
         message: "Server error",
+      });
+    }
+  },
+
+  // appliedForRole: async (req, res) => {
+  //     try {
+  //         const { appliedRole } = req.validatedBody;
+  //         const user = req.user;
+
+  //         if (user.role === appliedRole) {
+  //             return res.status(400).json({
+  //                 success: false,
+  //                 message: `You are already a ${appliedRole}. You cannot apply for the same role.`
+  //             });
+  //         }
+
+  //         const existingApplication = await RoleApplication.findOne({
+  //             userId:user.userId,
+  //             status: "Pending",
+  //         });
+
+  //         if (existingApplication) {
+  //             return res.status(400).json({
+  //                 success: false,
+  //                 message: `You already have a pending application for ${existingApplication.appliedRole}.`
+  //             });
+  //         }
+
+  //         const existingRole = await RoleHistory.findOne({
+  //             userId:user.userId,
+  //             previousRole: appliedRole,
+  //             action:"Demotion"
+  //         });
+
+  //         if (existingRole) {
+  //             return res.status(400).json({
+  //                 success: false,
+  //                 message: `You can not be apply to demoton adn reson is  already have a pending application for ${existingRole.reason} still ${existingRole.date}.`
+  //             });
+  //         }
+
+  //         const detail = {
+  //             userId: user.userId,
+  //             appliedRole: appliedRole,
+  //             status: "Pending",
+  //             appliedAt: new Date()
+  //         };
+
+  //         const newApplication = await RoleApplication.create(detail);
+
+  //         return res.status(200).json({
+  //             success: true,
+  //             message: `Application for ${appliedRole} submitted. Wait for Chief approval.`,
+  //             data: newApplication,
+  //         });
+
+  //     } catch (error) {
+  //         console.error("Application Error:", error);
+  //         return res.status(500).json({
+  //             success: false,
+  //             message: "Server error while submitting application.",
+  //             error:error.message
+  //         });
+  //     }
+  // },
+
+  appliedForRole: async (req, res) => {
+    try {
+      const { appliedRole } = req.validatedBody;
+      const user = req.user;
+
+      // 1. Current Role Check
+      if (user.role === appliedRole) {
+        return res.status(400).json({
+          success: false,
+          message: `You are already a ${appliedRole}.`,
+        });
+      }
+
+      // 2. Find the LATEST Demotion for this role
+      // const existingDemotion = await RoleHistory.findOne({
+      //     userId: userId,
+      //     previousRole: appliedRole,
+      //     action: "Demotion"
+      // }).sort({ createdAt: -1 });
+
+      // // 3. THE TIME CHECK: Is the user still in the "Blocked" period?
+      // if (existingDemotion && existingDemotion.blockedUntil) {
+      //     const now = new Date();
+      //     const unblockDate = new Date(existingDemotion.blockedUntil);
+
+      //     if (now < unblockDate) {
+      //         // If today is BEFORE the unblock date, they are still blocked
+      //         return res.status(403).json({
+      //             success: false,
+      //             message: `You cannot apply for ${appliedRole} until ${unblockDate.toDateString()}. Reason: ${existingDemotion.reason}`
+      //         });
+      //     }
+      // }
+
+      // 4. Pending Application Check
+      const existingPending = await RoleApplication.findOne({
+        userId: user._id,
+        status: "Pending",
+      });
+
+      if (existingPending) {
+        return res.status(400).json({
+          success: false,
+          message: `You already have a pending application for ${existingPending.appliedRole}.`,
+        });
+      }
+
+      // 5. Create the Application
+      const newApplication = await RoleApplication.create({
+        userId: user._id,
+        appliedRole: appliedRole,
+        status: "Pending",
+        appliedAt: new Date(),
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Application submitted for Chief review.",
+        data: newApplication,
+      });
+    } catch (error) {
+      console.error("Application Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message,
       });
     }
   },

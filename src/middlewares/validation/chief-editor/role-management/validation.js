@@ -1,8 +1,8 @@
 const schema = require("./schema");
 
 module.exports = {
-  paperSubmission: (req, res, next) => {    
-    const { error, value } = schema.paperSubmissionSchema.validate(req.body, {
+  acceptRoleValidator: (req, res, next) => {
+    const { error, value } = schema.acceptRoleStatus.validate(req.body, {
       abortEarly: false,
     });
 

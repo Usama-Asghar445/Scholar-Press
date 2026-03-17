@@ -33,7 +33,7 @@ router.post(
   controller.resendVerificationCode,
 );
 
-router.get("/get-user", [verifyTokenAndAttachUser], controller.getUser);
+router.get("/get-user", [verifyTokenAndAttachUser], controller.getUserById);
 router.patch(
   "/update-profile",
   [
@@ -52,6 +52,12 @@ router.patch(
     validate.completeUserProfileValidator,
   ],
   controller.completeUserProfile,
+);
+
+router.patch(
+  "/applied-for-role",
+  [verifyTokenAndAttachUser, validate.appliedForRoleValidator],
+  controller.appliedForRole,
 );
 
 module.exports = router;

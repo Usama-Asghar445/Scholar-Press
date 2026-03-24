@@ -297,7 +297,7 @@ module.exports = {
 
       return res.status(200).json({
         success: true,
-        message: `Welcome back, ${user.name}! Your ${user.role} dashboard data has been loaded successfully.`,
+        message: `Welcome back, ${user?.firstName}! Your Author dashboard data has been loaded successfully.`,
         data: user,
       });
     } catch (error) {

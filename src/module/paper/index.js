@@ -22,5 +22,7 @@ router.post(
   controller.createPaper,
 );
 
-router.get("/get-papers", controller.getPapers)
+router.get("/get-papers", controller.getPapers);
+router.get("/my-papers", verifyTokenAndAttachUser, controller.getMyPapers);
+router.get("/status-counts", verifyTokenAndAttachUser, controller.getPaperStatusCounts);
 module.exports = router;

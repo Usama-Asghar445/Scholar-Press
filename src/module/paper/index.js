@@ -17,7 +17,7 @@ router.post(
       { name: "figuresDetails", maxCount: 10 },
       { name: "supplementaryDetails", maxCount: 10 },
     ]),
-validate.paperSubmission
+    validate.paperSubmission
   ],
   controller.createPaper,
 );

@@ -8,5 +8,5 @@ const validation = require("../../../middlewares/validation/chief-editor/role-ma
 const router = express.Router();
 
 router.get ("/get-pending-applications",[verifyTokenAndAttachUser],controller.getPendingApplications)
-router.patch ("/accept-role-status",[verifyTokenAndAttachUser,validation.acceptRoleValidator],controller.acceptStatus)
+router.patch ("/accept-role-status",[verifyTokenAndAttachUser,validation.acceptRoleValidator],controller.acceptRole)
 module.exports = router;

@@ -23,5 +23,6 @@ validate.paperSubmission
 );
 
 router.get("/get-papers", controller.getPapers);
-router.get("/my-papers", verifyTokenAndAttachUser, controller.getPaperByStatus);
+router.get("/my-papers", verifyTokenAndAttachUser, controller.getMyPapers);
+router.get("/status-counts", verifyTokenAndAttachUser, controller.getPaperStatusCounts);
 module.exports = router;

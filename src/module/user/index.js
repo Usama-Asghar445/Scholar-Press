@@ -53,11 +53,4 @@ router.patch(
   ],
   controller.completeUserProfile,
 );
-
-router.patch(
-  "/applied-for-role",
-  [verifyTokenAndAttachUser, validate.appliedForRoleValidator],
-  controller.appliedForRole,
-);
-
 module.exports = router;

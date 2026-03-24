@@ -35,7 +35,7 @@ module.exports = {
     }
   },
 
-  acceptStatus: async (req, res) => {
+  acceptRole: async (req, res) => {
     try {
       const { userId, role, action, chiefNote } = req.body;
 

@@ -29,7 +29,7 @@ const educationSchema = new mongoose.Schema(
       required: true,
     },
     document: {
-      type: String, // Cloudinary URL
+      type: String,
     },
   },
   { timestamps: true },

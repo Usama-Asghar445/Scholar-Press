@@ -69,4 +69,27 @@ module.exports = {
       });
     }
   },
+
+  getPaperByStatus: async (req, res) => {
+    try {
+      const { userId } = req;
+      const { status } = req.query;
+
+      const papers = await paperRepo.findPapersByUserId(userId, status);
+
+      return res.status(200).json({
+        success: true,
+        message: "Papers fetched successfully",
+        count: papers.length,
+        data: papers,
+      });
+    } catch (error) {
+      console.error("Get My Papers Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch your papers",
+        error: error.message,
+      });
+    }
+  },
 };

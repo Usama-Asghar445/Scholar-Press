@@ -28,7 +28,7 @@ const roleHistorySchema = new mongoose.Schema(
     },
     action: {
       type: String,
-      enum: ["Promotion", "Demotion", "Manual Update"],
+      enum: ["Promotion", "Demotion", "Manual Update", "Rejection"],
       default: "Promotion",
     },
 

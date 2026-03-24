@@ -9,7 +9,7 @@ const validate = require("../../middlewares/validation/paper/validate");
 const router = express.Router();
 
 router.post(
-  "/submitted",
+  "/submit",
   [
     verifyTokenAndAttachUser,
     upload.fields([
@@ -17,10 +17,10 @@ router.post(
       { name: "figuresDetails", maxCount: 10 },
       { name: "supplementaryDetails", maxCount: 10 },
     ]),
-validate.paperSubmission
+    validate.paperSubmission
   ],
   controller.createPaper,
 );
 
-router.get("/get-papers",controller.getPapers)
+router.get("/get-papers", controller.getPapers)
 module.exports = router;

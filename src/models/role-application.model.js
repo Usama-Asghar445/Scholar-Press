@@ -18,6 +18,10 @@ const roleApplicationSchema = new mongoose.Schema(
       default: "Pending",
     },
     chiefRejectedNote: { type: String }, // Why was it rejected?
+    educationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "educations",
+    },
     appliedAt: { type: Date, default: Date.now },
     processedAt: { type: Date },
   },

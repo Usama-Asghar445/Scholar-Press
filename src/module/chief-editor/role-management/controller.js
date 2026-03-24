@@ -69,6 +69,20 @@ module.exports = {
         });
         user.role = role;
         await user.save();
+      } else if (action === "Rejected") {
+        // rejection penalty: 6 months
+        const blockedUntil = new Date();
+        blockedUntil.setMonth(blockedUntil.getMonth() + 6);
+
+        await RoleHistory.create({
+          userId,
+          previousRole: user.role,
+          newRole: role,
+          changedBy: req.user._id,
+          action: "Rejection",
+          reason: chiefNote || "Application rejected",
+          blockedUntil: blockedUntil,
+        });
       }
 
       // 3. Process Rejection (or cleanup after approval)
@@ -79,7 +93,7 @@ module.exports = {
 
       return res.status(200).json({
         success: true,
-        message: `User has been successfully ${action.toLowerCase()}.`,
+        message: `User has been successfully ${action.toLowerCase()}. ${action === "Rejected" ? "They are blocked from re-applying for 6 months." : ""}`,
       });
     } catch (error) {
       console.error(error);

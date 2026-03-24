@@ -11,6 +11,7 @@ const pushFileToCloudinary = require("../../utils/cloudinary-file-storage/index"
 const RoleApplication = require("../../models/role-application.model");
 const RoleHistory = require("../../models/role-history.model");
 const User = require("../../models/user.model");
+const Education = require("../../models/education.model");
 
 module.exports = {
   registerUser: async (req, res) => {
@@ -462,7 +463,7 @@ module.exports = {
 
   appliedForRole: async (req, res) => {
     try {
-      const { appliedRole } = req.validatedBody;
+      const { appliedRole, degree, institution, passingYear, major } = req.validatedBody;
       const user = req.user;
 
       // 1. Current Role Check
@@ -473,28 +474,27 @@ module.exports = {
         });
       }
 
-      // 2. Find the LATEST Demotion for this role
-      // const existingDemotion = await RoleHistory.findOne({
-      //     userId: userId,
-      //     previousRole: appliedRole,
-      //     action: "Demotion"
-      // }).sort({ createdAt: -1 });
+      // 2. 6-Month Block Check (if previously rejected)
+      const lastRejected = await RoleApplication.findOne({
+        userId: user._id,
+        appliedRole: appliedRole,
+        status: "Rejected",
+      }).sort({ processedAt: -1 });
 
-      // // 3. THE TIME CHECK: Is the user still in the "Blocked" period?
-      // if (existingDemotion && existingDemotion.blockedUntil) {
-      //     const now = new Date();
-      //     const unblockDate = new Date(existingDemotion.blockedUntil);
+      if (lastRejected && lastRejected.processedAt) {
+        const sixMonthsInMs = 6 * 30 * 24 * 60 * 60 * 1000;
+        const timeSinceRejection = Date.now() - new Date(lastRejected.processedAt).getTime();
 
-      //     if (now < unblockDate) {
-      //         // If today is BEFORE the unblock date, they are still blocked
-      //         return res.status(403).json({
-      //             success: false,
-      //             message: `You cannot apply for ${appliedRole} until ${unblockDate.toDateString()}. Reason: ${existingDemotion.reason}`
-      //         });
-      //     }
-      // }
+        if (timeSinceRejection < sixMonthsInMs) {
+          const reapplyDate = new Date(new Date(lastRejected.processedAt).getTime() + sixMonthsInMs);
+          return res.status(403).json({
+            success: false,
+            message: `Your previous application for ${appliedRole} was rejected. You can re-apply after ${reapplyDate.toDateString()}.`,
+          });
+        }
+      }
 
-      // 4. Pending Application Check
+      // 3. Pending Application Check
       const existingPending = await RoleApplication.findOne({
         userId: user._id,
         status: "Pending",
@@ -507,7 +507,7 @@ module.exports = {
         });
       }
 
-      // 5. Create the Application
+      // 4. Create the Application
       const newApplication = await RoleApplication.create({
         userId: user._id,
         appliedRole: appliedRole,
@@ -515,10 +515,34 @@ module.exports = {
         appliedAt: new Date(),
       });
 
+      // 5. Handle Education Information
+      let educationDocUrl = null;
+      if (req.file) {
+        const uploadRes = await pushFileToCloudinary(req.file);
+        educationDocUrl = uploadRes.url;
+      }
+
+      const newEducation = await Education.create({
+        userId: user._id,
+        roleApplicationId: newApplication._id,
+        degree,
+        institution,
+        passingYear,
+        major,
+        document: educationDocUrl,
+      });
+
+      // 6. Link Education to Application
+      newApplication.educationId = newEducation._id;
+      await newApplication.save();
+
       return res.status(200).json({
         success: true,
-        message: "Application submitted for Chief review.",
-        data: newApplication,
+        message: "Application submitted with education details for Chief review.",
+        data: {
+          application: newApplication,
+          education: newEducation,
+        },
       });
     } catch (error) {
       console.error("Application Error:", error);

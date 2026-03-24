@@ -261,5 +261,17 @@ module.exports = {
           "You can only apply to be a Reviewer, Editor, or Associate Editor.",
         "any.required": "Please specify the role you are applying for.",
       }),
+    degree: Joi.string().trim().required().messages({
+      "string.empty": "Degree is required for role application",
+    }),
+    institution: Joi.string().trim().required().messages({
+      "string.empty": "Institution is required",
+    }),
+    passingYear: Joi.string().trim().required().messages({
+      "string.empty": "Passing year is required",
+    }),
+    major: Joi.string().trim().required().messages({
+      "string.empty": "Major/Subject is required",
+    }),
   }),
 };

@@ -29,4 +29,58 @@ module.exports = {
       });
     }
   },
+  updateStatus: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      if (!status) {
+        return res.status(400).json({
+          success: false,
+          message: "Status is required",
+        });
+      }
+
+      const updatedPaper = await paperRepo.updatePaperStatus(id, status);
+
+      if (!updatedPaper) {
+        return res.status(404).json({
+          success: false,
+          message: "Paper not found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: `Paper status updated to ${status} successfully`,
+        data: updatedPaper,
+      });
+    } catch (error) {
+      console.error("Update Status Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update paper status",
+        error: error.message,
+      });
+    }
+  },
+  getPublishedPapers: async (req, res) => {
+    try {
+      const papers = await paperRepo.findPublishedPapers();
+
+      return res.status(200).json({
+        success: true,
+        message: "Published papers fetched successfully",
+        count: papers.length,
+        data: papers,
+      });
+    } catch (error) {
+      console.error("Get Published Papers Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch published papers",
+        error: error.message,
+      });
+    }
+  },
 };

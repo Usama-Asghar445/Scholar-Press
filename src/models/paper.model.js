@@ -64,6 +64,7 @@ const paperSchema = new mongoose.Schema(
         "Major Revision",
         "Accepted",
         "Rejected",
+        "Published",
       ],
     },
   },

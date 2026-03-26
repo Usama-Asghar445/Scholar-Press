@@ -8,6 +8,12 @@ module.exports = {
     if (status) query.status = status;
     return await Paper.find(query).sort({ createdAt: -1 });
   },
+  updatePaperStatus: async (id, status) => {
+    return await Paper.findByIdAndUpdate(id, { status }, { new: true });
+  },
+  findPublishedPapers: async () => {
+    return await Paper.find({ status: "Published" }).sort({ updatedAt: -1 });
+  },
   getPaperStatusCounts : async(userId) => {
     const counts = await Paper.aggregate([
         { $match: { userId: new (require('mongoose').Types.ObjectId)(userId) } },
@@ -21,7 +27,8 @@ module.exports = {
         underReview: 0,
         rejected: 0,
         minorRevision: 0,
-        majorRevision: 0
+        majorRevision: 0,
+        published: 0
     };
 
     counts.forEach(item => {
@@ -34,6 +41,7 @@ module.exports = {
             case "Rejected": result.rejected = count; break;
             case "Minor Revision": result.minorRevision = count; break;
             case "Major Revision": result.majorRevision = count; break;
+            case "Published": result.published = count; break;
             default: break;
         }
     });

@@ -127,4 +127,55 @@ module.exports = {
         .json({ success: false, message: "Internal server error" });
     }
   },
+
+  getUsers: async (req, res) => {
+    try {
+      const { role } = req.query;
+      let query = {};
+      if (role && role !== "All") {
+        query.role = role;
+      }
+      
+      const users = await userRepo.getUsersWithStats(query);
+
+      return res.status(200).json({
+        success: true,
+        count: users.length,
+        data: users,
+      });
+    } catch (error) {
+      console.error("Get Users Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch users",
+        error: error.message,
+      });
+    }
+  },
+
+  getUserProfile: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userProfile = await userRepo.getUserProfileDetails(id);
+
+      if (!userProfile) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: userProfile,
+      });
+    } catch (error) {
+      console.error("Get User Profile Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch user profile",
+        error: error.message,
+      });
+    }
+  },
 };

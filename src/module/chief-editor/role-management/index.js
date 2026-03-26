@@ -9,4 +9,6 @@ const router = express.Router();
 
 router.get ("/get-pending-applications",[verifyTokenAndAttachUser],controller.getPendingApplications)
 router.patch ("/accept-role-status",[verifyTokenAndAttachUser,validation.acceptRoleValidator],controller.acceptRole)
+router.get("/users", [verifyTokenAndAttachUser], controller.getUsers);
+router.get("/users/:id", [verifyTokenAndAttachUser], controller.getUserProfile);
 module.exports = router;

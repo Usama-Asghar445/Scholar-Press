@@ -16,6 +16,9 @@ const acceptRoleStatus = Joi.object({
   action: Joi.string().valid("Approved", "Rejected").required().messages({
     "any.only": "Action must be either 'Approved' or 'Rejected'.",
   }),
+ chiefNote: Joi.string().allow("").optional().messages({
+    "string.base": "Chief note must be a string.",
+  }),
 });
 
 

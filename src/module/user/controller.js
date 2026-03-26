@@ -311,6 +311,34 @@ module.exports = {
     }
   },
 
+  getUsers: async (req, res) => {
+    try {
+      const user = await User.find().select("-password");
+
+      if (!user) {
+        return res.status(200).json({
+          success: true,
+          message:
+            "No users found.",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+       message: `Users data has been loaded successfully.`,
+        data: user,
+      });
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      return res.status(500).json({
+        success: false,
+        message:
+          "Something went wrong while retrieving your account information.",
+        error: error.message,
+      });
+    }
+  },
+
   completeUserProfile: async (req, res) => {
     try {
       const email = req.userEmail;
@@ -398,5 +426,4 @@ module.exports = {
       });
     }
   },
-
 };

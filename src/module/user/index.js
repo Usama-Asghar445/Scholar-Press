@@ -34,6 +34,7 @@ router.post(
 );
 
 router.get("/get", [verifyTokenAndAttachUser], controller.getUserById);
+router.get("/get-users", [verifyTokenAndAttachUser], controller.getUsers);
 router.patch(
   "/update-profile",
   [

@@ -6,13 +6,37 @@ const RoleHistory = require("../../../models/role-history.model");
 module.exports = {
   getPendingApplications: async (req, res) => {
     try {
-      const applicants = await RoleApplication.find({
-        status: "Pending",
-      })
-        .sort({
-          createdAt: -1,
-        })
-        .populate("userId");
+      const applicants = await RoleApplication.aggregate([
+        {
+          $match: { status: "Pending" },
+        },
+        {
+          $sort: { createdAt: -1 },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $unwind: {
+            path: "$user",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "educations",
+            localField: "_id",
+            foreignField: "roleApplicationId",
+            as: "educations",
+          },
+        },
+      ]);
+
       if (!applicants || applicants.length === 0) {
         return res.status(200).json({
           success: true,
@@ -20,6 +44,7 @@ module.exports = {
           data: [],
         });
       }
+
       return res.status(200).json({
         success: true,
         count: applicants.length,

@@ -59,14 +59,63 @@ const paperSchema = new mongoose.Schema(
       type: String,
       enum: [
         "Submitted",
+        "Assigned to Editor",
+        "Assigned to Associate Editor",
         "Under Review",
+        "Reviews Completed",
         "Minor Revision",
         "Major Revision",
+        "Revised Submission",
         "Accepted",
         "Rejected",
         "Published",
       ],
+      default: "Submitted",
     },
+    handlingEditorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      default: null,
+    },
+    associateEditorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      default: null,
+    },
+    reviewers: [
+      {
+        reviewerId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+        invitationStatus: {
+          type: String,
+          enum: ["Pending", "Accepted", "Declined"],
+          default: "Pending",
+        },
+        reviewStatus: {
+          type: String,
+          enum: ["Pending", "Completed"],
+          default: "Pending",
+        },
+        decision: {
+          type: String,
+          enum: ["Accept", "Minor Revision", "Major Revision", "Reject"],
+          default: null,
+        },
+        comments: { type: String, default: "" },
+        assignedAt: { type: Date, default: Date.now },
+        respondedAt: { type: Date },
+        completedAt: { type: Date },
+      },
+    ],
+    workflowHistory: [
+      {
+        action: { type: String, required: true },
+        actorId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+        previousStatus: { type: String },
+        newStatus: { type: String },
+        comments: { type: String },
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true },
 );

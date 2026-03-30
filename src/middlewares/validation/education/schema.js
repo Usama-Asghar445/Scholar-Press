@@ -9,11 +9,11 @@ const educationValidationSchema = Joi.object({
       "any.required": "Please specify the role you are applying for.",
     }),
   degree: Joi.string()
-    .valid("Master", "PhD")
+    .trim()
     .required()
     .messages({
-      "any.only": "Degree must be Master or PhD",
       "any.required": "Degree is required",
+      "string.empty": "Degree cannot be empty",
     }),
   institution: Joi.string().trim().required().messages({
     "any.required": "Institution is required",

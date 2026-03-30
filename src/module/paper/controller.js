@@ -43,15 +43,26 @@ module.exports = {
 
   getPapers: async (req, res) => {
     try {
-      const papers = await paperRepo.findPapers();
+      const { user } = req;
+      let filter = {};
 
-      if (!papers || papers.length === 0) {
-        return res.status(200).json({
-          success: true,
-          message: "No papers found",
-          data: [],
-        });
+      if (user.role === "Editor") { // Handling Editor
+        filter = {
+          $or: [
+            { handlingEditorId: user._id },
+            { "paperDetails.subject": user.fieldOfStudy }
+          ]
+        };
+      } else if (user.role === "Associate Editor") {
+        filter = { associateEditorId: user._id };
+      } else if (user.role === "Reviewer") {
+        filter = { "reviewers.reviewerId": user._id };
+      } else if (user.role === "Author") {
+        filter = { userId: user._id };
       }
+      // EIC (Editor in Chief) sees all, so filter remains {}
+
+      const papers = await paperRepo.findPapers(filter);
 
       return res.status(200).json({
         success: true,
@@ -60,8 +71,7 @@ module.exports = {
         data: papers,
       });
     } catch (error) {
-      console.error("Get Papers  Error:", error);
-
+      console.error("Get Papers Error:", error);
       return res.status(500).json({
         success: false,
         message: "Failed to fetch papers",
@@ -95,8 +105,8 @@ module.exports = {
 
   getPaperStatusCounts: async (req, res) => {
     try {
-      const { userId } = req;
-      const counts = await paperRepo.getPaperStatusCounts(userId);
+      const { user } = req;
+      const counts = await paperRepo.getPaperStatusCounts(user._id, user.role, user.fieldOfStudy);
 
       return res.status(200).json({
         success: true,

@@ -313,27 +313,20 @@ module.exports = {
 
   getUsers: async (req, res) => {
     try {
-      const user = await User.find().select("-password");
-
-      if (!user) {
-        return res.status(200).json({
-          success: true,
-          message:
-            "No users found.",
-        });
-      }
+      const { role } = req.query;
+      const filter = role ? { role } : {};
+      const users = await User.find(filter).select("-password");
 
       return res.status(200).json({
         success: true,
-       message: `Users data has been loaded successfully.`,
-        data: user,
+        message: `Users data has been loaded successfully.`,
+        data: users,
       });
     } catch (error) {
-      console.error("Error fetching user:", error);
+      console.error("Error fetching users:", error);
       return res.status(500).json({
         success: false,
-        message:
-          "Something went wrong while retrieving your account information.",
+        message: "Something went wrong while retrieving users.",
         error: error.message,
       });
     }

@@ -9,7 +9,7 @@ const roleApplicationSchema = new mongoose.Schema(
     },
     appliedRole: {
       type: String,
-      enum: ["Reviewer", "Editor", "Associate Editor"],
+      enum: ["Reader", "Author", "Reviewer", "Editor", "Associate Editor", "Editor in Chief"],
       required: true,
     },
     status: {

@@ -25,4 +25,9 @@ router.post(
 router.get("/get-papers", controller.getPapers);
 router.get("/my-papers", verifyTokenAndAttachUser, controller.getMyPapers);
 router.get("/status-counts", verifyTokenAndAttachUser, controller.getPaperStatusCounts);
+
+// Workflow routes
+const workflowRoutes = require("./workflow.routes");
+router.use("/workflow", workflowRoutes);
+
 module.exports = router;

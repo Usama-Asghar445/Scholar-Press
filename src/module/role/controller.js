@@ -9,6 +9,13 @@ module.exports = {
     try {
       const { appliedRole, degree, institution, passingYear, major } = req.validatedBody;
       const user = req.user;
+      
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: "User authentication failed. Please log in again.",
+        });
+      }
 
       // 1. Current Role Check
       if (user.role === appliedRole) {
@@ -108,10 +115,14 @@ module.exports = {
       });
 
     } catch (error) {
-      console.error("Application Error:", error);
+      console.error("Critical Role Application Error:", {
+        message: error.message,
+        stack: error.stack,
+        userId: req.user?._id,
+      });
       return res.status(500).json({
         success: false,
-        message: "Server error",
+        message: "An internal server error occurred while processing your application. Please contact support.",
         error: error.message,
       });
     }

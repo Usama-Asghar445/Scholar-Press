@@ -10,12 +10,12 @@ const roleHistorySchema = new mongoose.Schema(
     },
     previousRole: {
       type: String,
-      enum: ["Author", "Reviewer", "Editor", "Associate Editor"],
+      enum: ["Reader", "Author", "Reviewer", "Editor", "Associate Editor", "Editor in Chief"],
       required: true,
     },
     newRole: {
       type: String,
-      enum: ["Author", "Reviewer", "Editor", "Associate Editor"],
+      enum: ["Reader", "Author", "Reviewer", "Editor", "Associate Editor", "Editor in Chief"],
       required: true,
     },
     changedBy: {

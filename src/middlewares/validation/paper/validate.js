@@ -1,8 +1,28 @@
 const schema = require("./schema");
 
+const parseMaybeJson = (value) => {
+  if (typeof value !== "string") return value;
+  try {
+    return JSON.parse(value);
+  } catch (err) {
+    return value;
+  }
+};
+
+const normalizeFormData = (body) => {
+  const parsedBody = { ...body };
+  parsedBody.paperDetails = parseMaybeJson(parsedBody.paperDetails);
+  parsedBody.authors = parseMaybeJson(parsedBody.authors);
+  if (typeof parsedBody.conflictOfInterest === "string") {
+    parsedBody.conflictOfInterest = parsedBody.conflictOfInterest === "true";
+  }
+  return parsedBody;
+};
+
 module.exports = {
-  paperSubmission: (req, res, next) => {    
-    const { error, value } = schema.paperSubmissionSchema.validate(req.body, {
+  paperSubmission: (req, res, next) => {
+    const body = normalizeFormData(req.body);
+    const { error, value } = schema.paperSubmissionSchema.validate(body, {
       abortEarly: false,
     });
 
@@ -15,4 +35,4 @@ module.exports = {
     req.validatedBody = value;
     next();
   },
-}
+};

@@ -17,12 +17,34 @@ router.post(
       { name: "figuresDetails", maxCount: 10 },
       { name: "supplementaryDetails", maxCount: 10 },
     ]),
-    validate.paperSubmission
+    validate.paperSubmission,
   ],
   controller.createPaper,
 );
 
 router.get("/get-papers", controller.getPapers);
 router.get("/my-papers", verifyTokenAndAttachUser, controller.getMyPapers);
-router.get("/status-counts", verifyTokenAndAttachUser, controller.getPaperStatusCounts);
+router.get(
+  "/status-counts",
+  verifyTokenAndAttachUser,
+  controller.getPaperStatusCounts,
+);
+router.get(
+  "/details/:id",
+  verifyTokenAndAttachUser,
+  controller.getPaperDetails,
+);
+router.patch(
+  "/resubmit/:id",
+  [
+    verifyTokenAndAttachUser,
+    upload.fields([
+      { name: "paper", maxCount: 1 },
+      { name: "figuresDetails", maxCount: 10 },
+      { name: "supplementaryDetails", maxCount: 10 },
+    ]),
+    validate.paperSubmission,
+  ],
+  controller.resubmitPaper,
+);
 module.exports = router;

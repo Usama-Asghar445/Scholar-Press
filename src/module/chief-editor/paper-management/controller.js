@@ -3,7 +3,11 @@ const paperRepo = require("../../../utils/repositories/paper/index");
 module.exports = {
   getPapersByEID: async (req, res) => {
     try {
-      const papers = await paperRepo.findPapers();
+      const { areaOfResearch, status } = req.body || req.query;
+      const query = {};
+      if (areaOfResearch) query.areaOfResearch = areaOfResearch;
+      if (status) query.status = status;
+      const papers = await paperRepo.findPapers(query);
 
       if (!papers || papers.length === 0) {
         return res.status(200).json({

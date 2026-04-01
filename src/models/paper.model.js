@@ -40,10 +40,14 @@ const paperSchema = new mongoose.Schema(
     },
 
     paperDetails: { type: paperDetailsSchema, required: true },
+    areaOfResearch: {
+      type: String,
+      enum: ["Computer Science", "Physics", "Biology"],
+    },
 
     authors: { type: [authorSchema], required: true },
 
-    conflictOfInterest: { type: Boolean, default:false },
+    conflictOfInterest: { type: Boolean, default: false },
 
     conflictDescription: { type: String, default: "" },
 

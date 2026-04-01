@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   verifyTokenAndAttachUser,
+  authorizeRoles,
 } = require("../../middlewares/auth-state/index");
 const validate = require("../../middlewares/validation/user/validate");
 const controller = require("./controller");
@@ -35,6 +36,11 @@ router.post(
 
 router.get("/get", [verifyTokenAndAttachUser], controller.getUserById);
 router.get("/get-users", [verifyTokenAndAttachUser], controller.getUsers);
+router.get(
+  "/related-users",
+  [verifyTokenAndAttachUser, authorizeRoles("Editor", "Associate Editor")],
+  controller.getRelatedUsers,
+);
 router.patch(
   "/update-profile",
   [

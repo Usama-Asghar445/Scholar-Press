@@ -1,9 +1,28 @@
 const TOKEN = require("../../utils/token/index");
-const User = require("../../models/user.model")
+const User = require("../../models/user.model");
+
+const authorizeRoles =
+  (...allowedRoles) =>
+  (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: No user attached",
+      });
+    }
+
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: insufficient permissions",
+      });
+    }
+
+    next();
+  };
 
 module.exports = {
   verifyTokenAndAttachUser: async (req, res, next) => {
-    
     if (!req.headers.authorization) {
       return res.status(401).json("Unauthorized: No token attached");
     }
@@ -11,7 +30,7 @@ module.exports = {
     let token = req.headers.authorization.split(" ")[1];
     try {
       req.user = TOKEN.verifyToken(token);
-      
+
       const retrieveUser = await User.findOne({ email: req.user.email });
       if (!retrieveUser) {
         return res.status(404).json({
@@ -39,4 +58,5 @@ module.exports = {
       return res.status(405).json("Invalid token");
     }
   },
+  authorizeRoles,
 };

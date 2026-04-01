@@ -43,7 +43,17 @@ module.exports = {
 
   getPapers: async (req, res) => {
     try {
-      const papers = await paperRepo.findPapers();
+      const { status } = req.query;
+      const query = {};
+
+      if (req.user && ["Editor", "Associate Editor"].includes(req.user.role)) {
+        query.areaOfResearch = req.user.fieldOfStudy;
+      } else if (req.query.areaOfResearch) {
+        query.areaOfResearch = req.query.areaOfResearch;
+      }
+
+      if (status) query.status = status;
+      const papers = await paperRepo.findPapers(query);
 
       if (!papers || papers.length === 0) {
         return res.status(200).json({

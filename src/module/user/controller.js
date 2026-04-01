@@ -318,14 +318,13 @@ module.exports = {
       if (!user) {
         return res.status(200).json({
           success: true,
-          message:
-            "No users found.",
+          message: "No users found.",
         });
       }
 
       return res.status(200).json({
         success: true,
-       message: `Users data has been loaded successfully.`,
+        message: `Users data has been loaded successfully.`,
         data: user,
       });
     } catch (error) {
@@ -334,6 +333,45 @@ module.exports = {
         success: false,
         message:
           "Something went wrong while retrieving your account information.",
+        error: error.message,
+      });
+    }
+  },
+
+  getRelatedUsers: async (req, res) => {
+    try {
+      const fieldOfStudy = req.user?.fieldOfStudy;
+      if (!fieldOfStudy) {
+        return res.status(400).json({
+          success: false,
+          message: "Editor field of study is required to fetch related users.",
+        });
+      }
+
+      const roles = ["Reviewer", "Associate Editor", "Author"];
+      const users = await userRepo.findUsers({
+        fieldOfStudy,
+        role: { $in: roles },
+      });
+
+      const grouped = {
+        reviewers: users.filter((user) => user.role === "Reviewer"),
+        associateEditors: users.filter(
+          (user) => user.role === "Associate Editor",
+        ),
+        authors: users.filter((user) => user.role === "Author"),
+      };
+
+      return res.status(200).json({
+        success: true,
+        message: "Related users loaded successfully.",
+        data: grouped,
+      });
+    } catch (error) {
+      console.error("Get Related Users Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch related users.",
         error: error.message,
       });
     }

@@ -1,22 +1,14 @@
 const Joi = require("joi");
 
 const authorSchema = Joi.object({
-  fullName: Joi.string()
-    .min(2)
-    .required()
-    .label("Author Full Name")
-    .messages({
-      "any.required": "{#label} is required",
-      "string.min": "{#label} must be at least 2 characters",
-    }),
-  email: Joi.string()
-    .email()
-    .required()
-    .label("Author Email")
-    .messages({
-      "any.required": "{#label} is required",
-      "string.email": "{#label} must be a valid email",
-    }),
+  fullName: Joi.string().min(2).required().label("Author Full Name").messages({
+    "any.required": "{#label} is required",
+    "string.min": "{#label} must be at least 2 characters",
+  }),
+  email: Joi.string().email().required().label("Author Email").messages({
+    "any.required": "{#label} is required",
+    "string.email": "{#label} must be a valid email",
+  }),
   country: Joi.string()
     .required()
     .label("Author Country")
@@ -35,7 +27,10 @@ const paperDetailsSchema = Joi.object({
   subject: Joi.string().required().label("Paper Subject"),
   abstract: Joi.string().required().label("Abstract"),
   correspondingName: Joi.string().required().label("Corresponding Author Name"),
-  correspondingEmail: Joi.string().email().required().label("Corresponding Author Email"),
+  correspondingEmail: Joi.string()
+    .email()
+    .required()
+    .label("Corresponding Author Email"),
   keywords: Joi.array()
     .items(Joi.string().min(1).label("Keyword"))
     .min(1)
@@ -49,10 +44,19 @@ const paperDetailsSchema = Joi.object({
 
 const paperSubmissionSchema = Joi.object({
   paperDetails: paperDetailsSchema.required().label("Paper Details"),
-  authors: Joi.array().items(authorSchema).min(1).required().label("Authors").messages({
-    "any.required": "{#label} are required",
-    "array.min": "At least one author is required",
-  }),
+  areaOfResearch: Joi.string()
+    .valid("Computer Science", "Physics", "Biology")
+    .required()
+    .label("Area of Research"),
+  authors: Joi.array()
+    .items(authorSchema)
+    .min(1)
+    .required()
+    .label("Authors")
+    .messages({
+      "any.required": "{#label} are required",
+      "array.min": "At least one author is required",
+    }),
   conflictOfInterest: Joi.boolean().required().label("Conflict of Interest"),
   conflictDescription: Joi.when("conflictOfInterest", {
     is: true,
@@ -60,6 +64,10 @@ const paperSubmissionSchema = Joi.object({
     otherwise: Joi.string().allow("").optional(),
   }),
   dataAvailability: Joi.string().required().label("Data Availability"),
+  areaOfResearch: Joi.string()
+    .valid("Computer Science", "Physics", "Biology")
+    .required()
+    .label("Area of Research"),
 });
 
-module.exports = {paperSubmissionSchema};
+module.exports = { paperSubmissionSchema };

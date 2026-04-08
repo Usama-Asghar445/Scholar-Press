@@ -1,4 +1,3 @@
-const { string } = require("joi");
 const mongoose = require("mongoose");
 
 const fileSchema = new mongoose.Schema({
@@ -17,6 +16,8 @@ const paperDetailsSchema = new mongoose.Schema({
   title: { type: String, required: true },
   type: { type: String, required: true },
   runningTitle: { type: String, required: true },
+  field: { type: String, required: true },
+  subField: { type: String, default: "" },
   subject: { type: String, required: true },
   abstract: { type: String, required: true },
   correspondingName: { type: String, required: true },
@@ -32,7 +33,6 @@ const paperDetailsSchema = new mongoose.Schema({
 
 const paperSchema = new mongoose.Schema(
   {
-    // journalsId:{ type: mongoose.Schema.Types.ObjectId, ref: "Journals", required: true },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
@@ -40,19 +40,54 @@ const paperSchema = new mongoose.Schema(
     },
 
     paperDetails: { type: paperDetailsSchema, required: true },
+
+    authors: { type: [authorSchema], r
     areaOfResearch: {
       type: String,
       enum: ["Computer Science", "Physics", "Biology"],
-    },
+    },equired: true },
 
-    authors: { type: [authorSchema], required: true },
-
-    conflictOfInterest: { type: Boolean, default: false },
+    conflictOfInterest: { type: Boolean, d    conflictOfInterest: { type: Boolean, default: false },
 
     conflictDescription: { type: String, default: "" },
 
     dataAvailability: { type: String, required: true },
 
+    },
+    assignedAE: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      default: null,
+    },
+    assignedReviewers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users",
+      },
+    ],
+    reviewHistory: [
+      {
+        reviewerId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "users",
+        },
+        recommendation: {
+          type: String,
+          enum: ["Accept", "Minor Revision", "Major Revision", "Reject"],
+        },
+        comments: String,
+        submittedAt: Date,
+      },
+    ],
+    finalDecision: {
+      type: String,
+      enum: ["Accepted", "Rejected", "Revision Requested", "Pending"],
+      default: "Pending",
+    },
+    finalDecisionNotes: {
+      type: String,
+      default: "",
+    },
     paperFiles: {
       paper: { type: fileSchema, required: true },
       figuresDetails: { type: [fileSchema], default: [] },
@@ -70,6 +105,7 @@ const paperSchema = new mongoose.Schema(
         "Rejected",
         "Published",
       ],
+      default: "Submitted",
     },
   },
   { timestamps: true },

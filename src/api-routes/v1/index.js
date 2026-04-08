@@ -11,4 +11,5 @@ router.use("/paper", paperModule);
 router.use("/editor-in-chief", chiefEditorModule);
 router.use("/role", roleModule);
 
+
 module.exports = router;
